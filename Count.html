@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi Countdown Timers</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    input, button, input[type="datetime-local"] {
+        padding: 10px;
+        font-size: 16px;
+        margin: 5px 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    .timer-list {
+        margin-top: 20px;
+    }
+    .timer-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+    .timer-item h3 {
+        margin: 0;
+    }
+    .timer-item p {
+        margin: 2px 0;
+    }
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        float: right;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>My Countdown Timers</h1>
+    <input type="text" id="timerName" placeholder="Enter timer name">
+    <input type="datetime-local" id="timerDate">
+    <button onclick="addTimer()">Add Timer</button>
+    
+    <div class="timer-list" id="timerList"></div>
+</div>
+
+<script>
+let timers = [];
+
+// Load timers from localStorage
+if(localStorage.getItem('timers')) {
+    timers = JSON.parse(localStorage.getItem('timers'));
+}
+
+// Function to add a new timer
+function addTimer() {
+    const name = document.getElementById('timerName').value.trim();
+    const date = document.getElementById('timerDate').value;
+
+    if(name && date) {
+        timers.push({name, targetDate: new Date(date).getTime()});
+        localStorage.setItem('timers', JSON.stringify(timers));
+        document.getElementById('timerName').value = '';
+        document.getElementById('timerDate').value = '';
+        renderTimers();
+    } else {
+        alert("Please enter both name and date");
+    }
+}
+
+// Function to delete a timer
+function deleteTimer(index) {
+    timers.splice(index, 1);
+    localStorage.setItem('timers', JSON.stringify(timers));
+    renderTimers();
+}
+
+// Function to calculate time remaining
+function getTimeRemaining(targetTime) {
+    const now = new Date().getTime();
+    let diff = Math.floor((targetTime - now) / 1000); // seconds
+    if(diff < 0) diff = 0;
+
+    const days = Math.floor(diff / 86400);
+    const hours = Math.floor((diff % 86400) / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = diff % 60;
+
+    return {
+        formatted: `${days}d ${hours}h ${minutes}m ${seconds}s`,
+        totalSeconds: diff
+    };
+}
+
+// Function to render timers
+function renderTimers() {
+    const container = document.getElementById('timerList');
+    container.innerHTML = '';
+
+    timers.forEach((timer, index) => {
+        const remaining = getTimeRemaining(timer.targetDate);
+
+        const div = document.createElement('div');
+        div.className = 'timer-item';
+
+        div.innerHTML = `
+            <h3>${timer.name} 
+                <button class="delete-btn" onclick="deleteTimer(${index})">Delete</button>
+            </h3>
+            <p>Countdown: ${remaining.formatted}</p>
+            <p>Total seconds: ${remaining.totalSeconds}</p>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+// Update timers every second
+setInterval(renderTimers, 1000);
+
+// Initial render
+renderTimers();
+</script>
+
+</body>
+</html>

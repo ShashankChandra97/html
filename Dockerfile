@@ -1,2 +1,2 @@
 FROM nginx:alpine
-COPY index.html /usr/share/nginx/html/index.html
+COPY Count.html /usr/share/nginx/html/Count.html

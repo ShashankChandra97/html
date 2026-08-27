@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-density="comfortable">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="CloudVeyra is an interactive, browser-only Azure operations dashboard demo."/>
+<meta name="theme-color" content="#090b10"/>
+<title>CloudVeyra Demo — Unified Cloud Operations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script>
+  try {
+    const saved = JSON.parse(localStorage.getItem('cloudveyra-demo-preferences') || '{}');
+    const light = window.matchMedia('(prefers-color-scheme: light)').matches;
+    document.documentElement.dataset.theme = saved.theme === 'light' || (saved.theme === 'system' && light) ? 'light' : 'dark';
+    document.documentElement.dataset.density = saved.density || 'comfortable';
+  } catch (error) {}
+</script>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to dashboard</a>
+
+<div class="environment" aria-hidden="true">
+  <div class="environment__grid" data-depth="-0.012"></div>
+  <div class="environment__orb environment__orb--one" data-depth="-0.028"></div>
+  <div class="environment__orb environment__orb--two" data-depth="0.018"></div>
+  <div class="environment__noise"></div>
+</div>
+
+<header class="topbar">
+  <div class="topbar__start">
+    <button class="icon-button mobile-menu" type="button" data-menu-toggle aria-expanded="false" aria-label="Open navigation">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <a class="brand" href="index.html" aria-label="CloudVeyra dashboard">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32"><path d="M8.5 22.5h14.2a5.3 5.3 0 0 0 .4-10.6A7.7 7.7 0 0 0 8.5 9.7a6.4 6.4 0 0 0 0 12.8Z"/><circle cx="19.5" cy="18.5" r="5.5"/><path d="m23.5 22.5 4 4"/></svg>
+      </span>
+      <span class="brand__wordmark">CloudVeyra</span>
+      <span class="demo-badge">Demo</span>
+    </a>
+    <div class="topbar__context" aria-label="Current location">
+      <span>Operations</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><strong data-current-section>Overview</strong>
+    </div>
+  </div>
+  <div class="topbar__actions">
+    <span class="system-state"><span></span>All systems nominal</span>
+    <button class="quick-jump" type="button" data-open-command aria-haspopup="dialog" aria-controls="command-menu" aria-label="Open quick jump">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><span>Quick jump</span><kbd>⌘ K</kbd>
+    </button>
+    <button class="icon-button" type="button" data-open-settings aria-expanded="false" aria-controls="settings-drawer" aria-label="Open settings">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 3.6 15a1.7 1.7 0 0 0-1.6-1h-.1V10h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.06 4.2l.06.06A1.7 1.7 0 0 0 8 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.6 1h.1v4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg>
+    </button>
+    <a class="portfolio-link" href="../../index.html">
+      Portfolio <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+  <div class="page-progress" aria-hidden="true"><span data-page-progress></span></div>
+</header>
+
+<div class="sidebar-scrim" id="sidebar-scrim"></div>
+<aside class="sidebar" id="sidebar" aria-label="CloudVeyra navigation">
+  <div class="sidebar__workspace">
+    <span class="workspace-icon" aria-hidden="true">JA</span>
+    <span><strong>Jarvis AI</strong><small>Production workspace</small></span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg>
+  </div>
+  <nav class="side-nav" aria-label="Demo sections">
+    <span class="side-nav__indicator" aria-hidden="true"></span>
+    <span class="side-nav__label">Workspace</span>
+    <a class="is-active" href="#overview" data-section-link aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-3H4v3Zm10 0h6v-9h-6v9Zm0-16v3h6V4h-6Z"/></svg>Overview
+    </a>
+    <a href="#resources" data-section-link>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3M12 12.1V21"/></svg>Resources
+    </a>
+    <a href="kubernetes.html">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="5"/></svg>Kubernetes
+    </a>
+    <a href="#activity" data-section-link>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V7M16 16v-3M20 16V9"/></svg>Activity
+    </a>
+  </nav>
+  <div class="sidebar__foot">
+    <div class="demo-note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg>
+      <span><strong>Browser-only demo</strong><small>No Azure account required</small></span>
+    </div>
+    <button type="button" data-open-settings aria-expanded="false" aria-controls="settings-drawer">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></svg>Preferences
+    </button>
+  </div>
+</aside>
+
+<main class="app-main" id="main-content">
+  <section class="hero" id="overview">
+    <div class="hero__copy" data-reveal data-ui-depth="0.028">
+      <span class="section-kicker"><span></span>Unified cloud operations</span>
+      <h1>Every Azure signal.<br/><em>One clear<br/>view.</em></h1>
+      <p>CloudVeyra turns scattered infrastructure into one focused operating picture—resources, health, deployment activity, and performance without the portal hopping.</p>
+      <div class="hero__actions">
+        <a class="button button--primary" href="#resources">Explore resources<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="button button--quiet" href="kubernetes.html">Open AKS simulation</a>
+      </div>
+      <div class="hero__proof">
+        <span><strong>04</strong> services mapped</span>
+        <span><strong>02</strong> subscriptions</span>
+        <span><strong>100%</strong> sample health</span>
+      </div>
+    </div>
+
+    <div class="topology" data-topology data-depth="0.018" aria-label="Illustration of connected Azure services">
+      <div class="topology__halo"></div>
+      <svg class="topology__lines" viewBox="0 0 560 460" aria-hidden="true">
+        <path d="M280 225 148 120M280 225 424 104M280 225 446 326M280 225 116 342"/>
+        <path class="topology__pulse" d="M280 225 148 120M280 225 424 104M280 225 446 326M280 225 116 342"/>
+      </svg>
+      <div class="topology__core">
+        <span class="topology__core-icon"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8.5 22.5h14.2a5.3 5.3 0 0 0 .4-10.6A7.7 7.7 0 0 0 8.5 9.7a6.4 6.4 0 0 0 0 12.8Z"/><circle cx="19.5" cy="18.5" r="5.5"/><path d="m23.5 22.5 4 4"/></svg></span>
+        <strong>CloudVeyra</strong><small>Live topology</small>
+      </div>
+      <div class="topology__node topology__node--one"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z"/><path d="M4 9V5h4M16 4h4v4M20 16v4h-4M8 20H4v-4"/></svg></span><strong>AKS</strong><small>12 nodes</small></div>
+      <div class="topology__node topology__node--two"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3"/></svg></span><strong>API</strong><small>18.4k rpm</small></div>
+      <div class="topology__node topology__node--three"><span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.8 2.7 8 7 10 4.3-2 7-5.2 7-10V6l-7-3Z"/></svg></span><strong>Vault</strong><small>24 secrets</small></div>
+      <div class="topology__node topology__node--four"><span><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v12c0 1.7 3.1 3 7 3s7-1.3 7-3V5M5 11c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></span><strong>Cosmos</strong><small>47% RU</small></div>
+      <span class="topology__status"><i></i>Sample telemetry active</span>
+    </div>
+  </section>
+
+  <section class="metrics" aria-label="Platform summary" data-reveal>
+    <article class="metric-card motion-surface" data-ui-depth="0.038"><span class="metric-card__label">Platform health</span><div><strong>100%</strong><span class="trend trend--good">Nominal</span></div><svg viewBox="0 0 180 48" aria-hidden="true"><path d="M2 37 25 31 48 34 70 21 92 25 115 15 138 19 178 7"/></svg></article>
+    <article class="metric-card motion-surface" data-ui-depth="0.056"><span class="metric-card__label">Average latency</span><div><strong>29.7 <small>ms</small></strong><span class="trend trend--good">-6.8%</span></div><svg viewBox="0 0 180 48" aria-hidden="true"><path d="M2 11 25 16 48 14 70 25 92 21 115 30 138 27 178 39"/></svg></article>
+    <article class="metric-card motion-surface" data-ui-depth="0.044"><span class="metric-card__label">Active resources</span><div><strong>04</strong><span class="trend">2 regions</span></div><div class="metric-card__bars" aria-hidden="true"><i style="--h:42%"></i><i style="--h:58%"></i><i style="--h:48%"></i><i style="--h:76%"></i><i style="--h:66%"></i><i style="--h:88%"></i><i style="--h:72%"></i></div></article>
+  </section>
+
+  <section class="content-section" id="resources">
+    <div class="section-heading" data-reveal data-ui-depth="0.022">
+      <div><span class="section-kicker">Resource intelligence</span><h2>Infrastructure, without the noise.</h2><p>Search and inspect a realistic, static snapshot of the Jarvis AI environment.</p></div>
+      <span class="updated-label"><span></span>Updated just now</span>
+    </div>
+    <div class="resource-toolbar motion-surface" data-reveal data-ui-depth="0.034">
+      <label class="search-control" for="resource-search"><span class="sr-only">Search resources</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><input id="resource-search" type="search" placeholder="Search resources, regions, or tags" autocomplete="off"/></label>
+      <div class="filter-group" aria-label="Filter resources">
+        <button class="is-active" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" data-filter="compute" aria-pressed="false">Compute</button>
+        <button type="button" data-filter="data" aria-pressed="false">Data</button>
+        <button type="button" data-filter="security" aria-pressed="false">Security</button>
+      </div>
+      <span class="resource-count" id="resource-count">4 resources</span>
+    </div>
+    <div class="resource-grid" id="resource-grid"></div>
+  </section>
+
+  <section class="content-section activity-section" id="activity">
+    <div class="section-heading" data-reveal data-ui-depth="0.022"><div><span class="section-kicker">Operational context</span><h2>What changed, and why it matters.</h2></div></div>
+    <div class="activity-layout">
+      <article class="activity-panel motion-surface" data-reveal data-ui-depth="0.036">
+        <div class="panel-heading"><div><span>Recent activity</span><strong>Environment timeline</strong></div></div>
+        <ol class="activity-list" id="activity-list"></ol>
+      </article>
+      <aside class="architecture-card motion-surface" data-reveal data-ui-depth="0.058">
+        <span class="architecture-card__eyebrow">Architecture</span>
+        <h3>Designed for clarity at enterprise scale.</h3>
+        <p>The production concept queries Azure Resource Graph by project tags, then combines health signals and deployment context into one operational surface.</p>
+        <div class="architecture-flow" aria-label="Conceptual data flow"><span>Azure Graph</span><i></i><span>CloudVeyra</span><i></i><span>Operator</span></div>
+        <a href="kubernetes.html">Explore the AKS workflow<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </aside>
+    </div>
+  </section>
+
+  <footer class="app-footer"><span>CloudVeyra Demo · Static browser experience</span><a href="../../index.html">Back to Shashank Chandra's portfolio</a></footer>
+</main>
+
+<div class="settings-scrim" id="settings-scrim"></div>
+<aside class="settings-drawer" id="settings-drawer" aria-labelledby="settings-title" aria-hidden="true">
+  <div class="settings-drawer__head"><div><span>Workspace</span><h2 id="settings-title">Preferences</h2></div><button class="icon-button" type="button" data-close-settings aria-label="Close settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+  <div class="settings-drawer__body">
+    <section class="setting-group" data-preference="theme"><div><h3>Appearance</h3><p>Choose the interface theme for this demo.</p></div><div class="segmented-control"><button type="button" data-value="dark" aria-pressed="true">Dark</button><button type="button" data-value="light" aria-pressed="false">Light</button><button type="button" data-value="system" aria-pressed="false">System</button></div></section>
+    <section class="setting-group" data-preference="density"><div><h3>Interface density</h3><p>Adjust the spacing of dashboard surfaces.</p></div><div class="segmented-control segmented-control--two"><button type="button" data-value="comfortable" aria-pressed="true">Comfortable</button><button type="button" data-value="compact" aria-pressed="false">Compact</button></div></section>
+    <div class="settings-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg><p>Preferences are stored only in this browser. This demo never sends data to a server.</p></div>
+  </div>
+</aside>
+
+<dialog class="resource-dialog" id="resource-dialog" aria-labelledby="resource-dialog-title">
+  <button class="icon-button resource-dialog__close" type="button" data-close-resource aria-label="Close resource details"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+  <div id="resource-dialog-content"></div>
+</dialog>
+
+<script src="js/demo-data.js"></script>
+<script src="js/shell.js"></script>
+<script src="js/demo-app.js"></script>
+</body>
+</html>

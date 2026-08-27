@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-density="comfortable">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="Interactive browser-only Kubernetes scaling simulation for CloudVeyra."/>
+<meta name="theme-color" content="#090b10"/>
+<title>CloudVeyra Demo — AKS Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script>
+  try {
+    const saved = JSON.parse(localStorage.getItem('cloudveyra-demo-preferences') || '{}');
+    const light = window.matchMedia('(prefers-color-scheme: light)').matches;
+    document.documentElement.dataset.theme = saved.theme === 'light' || (saved.theme === 'system' && light) ? 'light' : 'dark';
+    document.documentElement.dataset.density = saved.density || 'comfortable';
+  } catch (error) {}
+</script>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to AKS simulation</a>
+<div class="environment" aria-hidden="true"><div class="environment__grid" data-depth="-0.012"></div><div class="environment__orb environment__orb--one" data-depth="-0.028"></div><div class="environment__orb environment__orb--two" data-depth="0.018"></div><div class="environment__noise"></div></div>
+
+<header class="topbar">
+  <div class="topbar__start">
+    <button class="icon-button mobile-menu" type="button" data-menu-toggle aria-expanded="false" aria-label="Open navigation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <a class="brand" href="index.html" aria-label="CloudVeyra dashboard"><span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M8.5 22.5h14.2a5.3 5.3 0 0 0 .4-10.6A7.7 7.7 0 0 0 8.5 9.7a6.4 6.4 0 0 0 0 12.8Z"/><circle cx="19.5" cy="18.5" r="5.5"/><path d="m23.5 22.5 4 4"/></svg></span><span class="brand__wordmark">CloudVeyra</span><span class="demo-badge">Demo</span></a>
+    <div class="topbar__context" aria-label="Current location"><span>Operations</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg><strong data-current-section>Kubernetes</strong></div>
+  </div>
+  <div class="topbar__actions"><span class="system-state"><span></span>Simulation ready</span><button class="quick-jump" type="button" data-open-command aria-haspopup="dialog" aria-controls="command-menu" aria-label="Open quick jump"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m16 16 4 4"/></svg><span>Quick jump</span><kbd>⌘ K</kbd></button><button class="icon-button" type="button" data-open-settings aria-expanded="false" aria-controls="settings-drawer" aria-label="Open settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.86 2.86-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.1A1.7 1.7 0 0 0 8 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.86-2.86.06-.06A1.7 1.7 0 0 0 3.6 15a1.7 1.7 0 0 0-1.6-1h-.1V10h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.34-1.88l-.06-.06L6.06 4.2l.06.06A1.7 1.7 0 0 0 8 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.86 2.86-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.6 1h.1v4h-.1a1.7 1.7 0 0 0-1.6 1Z"/></svg></button><a class="portfolio-link" href="../../index.html">Portfolio<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  <div class="page-progress" aria-hidden="true"><span data-page-progress></span></div>
+</header>
+
+<div class="sidebar-scrim" id="sidebar-scrim"></div>
+<aside class="sidebar" id="sidebar" aria-label="CloudVeyra navigation">
+  <div class="sidebar__workspace"><span class="workspace-icon" aria-hidden="true">JA</span><span><strong>Jarvis AI</strong><small>Production workspace</small></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></div>
+  <nav class="side-nav" aria-label="Demo sections">
+    <span class="side-nav__indicator" aria-hidden="true"></span>
+    <span class="side-nav__label">Workspace</span>
+    <a href="index.html#overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13h6V4H4v9Zm0 7h6v-3H4v3Zm10 0h6v-9h-6v9Zm0-16v3h6V4h-6Z"/></svg>Overview</a>
+    <a href="index.html#resources"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3M12 12.1V21"/></svg>Resources</a>
+    <a class="is-active" href="kubernetes.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="5"/></svg>Kubernetes</a>
+    <a href="index.html#activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5M4 19h16M8 16v-5M12 16V7M16 16v-3M20 16V9"/></svg>Activity</a>
+  </nav>
+  <div class="sidebar__foot"><div class="demo-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l2.5 2.5"/><circle cx="12" cy="12" r="9"/></svg><span><strong>Browser-only demo</strong><small>No cluster connection required</small></span></div><button type="button" data-open-settings aria-expanded="false" aria-controls="settings-drawer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h7M15 18h5"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="13" cy="18" r="2"/></svg>Preferences</button></div>
+</aside>
+
+<main class="app-main" id="main-content">
+  <section class="aks-hero" data-reveal data-ui-depth="0.026"><span class="section-kicker"><span></span>AKS deployment control</span><h1>Scale the workload.<br/>Keep the context.</h1><p>Explore a local simulation of Kubernetes scaling, pod readiness, and deployment events. Every interaction runs in this browser—no cluster credentials or backend services.</p></section>
+  <section class="aks-layout">
+    <article class="cluster-panel motion-surface" data-reveal data-ui-depth="0.038">
+      <div class="cluster-panel__head"><div class="cluster-title"><span class="resource-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="5"/></svg></span><div><h2>deployment/jarvis-ai-api</h2><p>namespace/production · aks-jarvis-prod</p></div></div><span class="cluster-status">Ready</span></div>
+      <div class="cluster-stats"><div><span>Ready replicas</span><strong id="ready-output">3 / 3</strong></div><div><span>CPU request</span><strong>420m</strong></div><div><span>Memory request</span><strong>1.2 GiB</strong></div></div>
+      <div class="pod-stage"><div class="pod-orbit" id="pod-grid" aria-label="Simulated Kubernetes pods"></div></div>
+      <div class="scale-bar"><div class="scale-control" aria-label="Target replica count"><button type="button" data-scale-down aria-label="Decrease replicas">−</button><output id="replica-output" aria-live="polite">3</output><button type="button" data-scale-up aria-label="Increase replicas">+</button></div><button class="apply-button" type="button" data-apply-scale>Apply simulated scale</button></div>
+      <p class="sr-only" id="scale-status" aria-live="polite"></p>
+    </article>
+    <aside class="event-console motion-surface" data-reveal data-ui-depth="0.058"><h2>Deployment events</h2><p>Local event stream generated by the simulation.</p><div class="console-output" id="console-output" aria-live="polite"></div></aside>
+  </section>
+  <footer class="app-footer"><span>CloudVeyra Demo · Static AKS simulation</span><a href="index.html">Return to dashboard overview</a></footer>
+</main>
+
+<div class="settings-scrim" id="settings-scrim"></div>
+<aside class="settings-drawer" id="settings-drawer" aria-labelledby="settings-title" aria-hidden="true">
+  <div class="settings-drawer__head"><div><span>Workspace</span><h2 id="settings-title">Preferences</h2></div><button class="icon-button" type="button" data-close-settings aria-label="Close settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+  <div class="settings-drawer__body">
+    <section class="setting-group" data-preference="theme"><div><h3>Appearance</h3><p>Choose the interface theme for this demo.</p></div><div class="segmented-control"><button type="button" data-value="dark" aria-pressed="true">Dark</button><button type="button" data-value="light" aria-pressed="false">Light</button><button type="button" data-value="system" aria-pressed="false">System</button></div></section>
+    <section class="setting-group" data-preference="density"><div><h3>Interface density</h3><p>Adjust spacing across the demo surfaces.</p></div><div class="segmented-control segmented-control--two"><button type="button" data-value="comfortable" aria-pressed="true">Comfortable</button><button type="button" data-value="compact" aria-pressed="false">Compact</button></div></section>
+    <div class="settings-note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4M12 16h.01"/><circle cx="12" cy="12" r="9"/></svg><p>Preferences stay in this browser. The simulation never sends data to a server.</p></div>
+  </div>
+</aside>
+
+<script src="js/shell.js"></script>
+<script src="js/aks-demo.js"></script>
+</body>
+</html>

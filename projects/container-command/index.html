@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Container Command — Learn Docker &amp; Kubernetes</title>
+<style>
+  :root{
+    --page:#f1f5f9;
+    --surface:#ffffff;
+    --surface-soft:#f8fafc;
+    --surface-tint:#eff6ff;
+    --ink:#102033;
+    --ink-soft:#526175;
+    --ink-faint:#748196;
+    --line:#dbe3ed;
+    --line-strong:#c7d2df;
+    --navy:#0c2036;
+    --navy-soft:#163754;
+    --docker:#1686d9;
+    --k8s:#315fd4;
+    --accent:#22c55e;
+    --good:#16733b;
+    --good-bg:#eaf8ef;
+    --bad:#b42318;
+    --bad-bg:#fff0ee;
+    --focus:#2563eb;
+    --radius-sm:12px;
+    --radius-md:18px;
+    --radius-lg:28px;
+    --shadow-sm:0 1px 2px rgba(15, 35, 55, .06), 0 8px 24px rgba(15, 35, 55, .06);
+    --shadow-lg:0 26px 70px rgba(23, 45, 70, .13), 0 4px 14px rgba(23, 45, 70, .07);
+    --ease:cubic-bezier(.22, 1, .36, 1);
+    --mono:"SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{min-width:320px;background:var(--page);}
+  body{
+    margin:0;
+    min-height:100dvh;
+    color:var(--ink);
+    font-family:Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(circle at 12% 4%, rgba(22,134,217,.11), transparent 28rem),
+      radial-gradient(circle at 90% 34%, rgba(49,95,212,.08), transparent 30rem),
+      var(--page);
+    padding:24px clamp(16px, 4vw, 48px) 56px;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    opacity:.3;
+    background-image:radial-gradient(rgba(72, 94, 120, .2) .7px, transparent .7px);
+    background-size:18px 18px;
+    mask-image:linear-gradient(to bottom, #000, transparent 72%);
+  }
+  button{font:inherit;}
+  button, [role="button"]{touch-action:manipulation;}
+  button:focus-visible, [tabindex]:focus-visible{
+    outline:3px solid rgba(37, 99, 235, .32);
+    outline-offset:3px;
+  }
+  .skip-link{
+    position:fixed;
+    left:16px;
+    top:12px;
+    z-index:20;
+    transform:translateY(-150%);
+    padding:10px 14px;
+    border-radius:10px;
+    background:var(--navy);
+    color:#fff;
+    font-weight:700;
+    text-decoration:none;
+  }
+  .skip-link:focus{transform:translateY(0);}
+  .app{width:min(100%, 980px); margin:0 auto;}
+  .app, .hero-copy, #stage, .card{min-width:0;}
+
+  /* ---- Product bar ---- */
+  .product-bar{
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:20px;
+  }
+  .brand{
+    display:inline-flex;
+    align-items:center;
+    gap:11px;
+    color:var(--ink);
+    font-size:14px;
+    font-weight:780;
+    letter-spacing:-.01em;
+  }
+  .brand-mark{
+    width:36px;
+    height:36px;
+    display:grid;
+    place-items:center;
+    border-radius:11px;
+    color:#fff;
+    background:linear-gradient(145deg, var(--docker), var(--k8s));
+    box-shadow:0 8px 18px rgba(37, 99, 235, .25);
+  }
+  .session-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:36px;
+    padding:8px 12px;
+    border:1px solid rgba(199,210,223,.85);
+    border-radius:999px;
+    color:var(--ink-soft);
+    background:rgba(255,255,255,.72);
+    backdrop-filter:blur(10px);
+    font-size:12px;
+    font-weight:700;
+  }
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(34,197,94,.12);}
+
+  /* ---- Hero / progress ---- */
+  header.top{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    padding:clamp(28px, 5vw, 48px);
+    color:#fff;
+    background:linear-gradient(135deg, var(--navy) 0%, #102d49 56%, #123d65 100%);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg);
+  }
+  header.top::before, header.top::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    pointer-events:none;
+    border-radius:50%;
+  }
+  header.top::before{width:380px;height:380px;right:-140px;top:-230px;background:rgba(30,144,230,.24);}
+  header.top::after{width:260px;height:260px;right:80px;bottom:-225px;border:55px solid rgba(87,141,232,.12);}
+  .hero-copy{max-width:700px;}
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+    color:#9ed5ff;
+    font-size:12px;
+    font-weight:760;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .eyebrow::before{content:"";width:18px;height:2px;border-radius:2px;background:#41a8f3;}
+  h1{
+    max-width:780px;
+    margin:0;
+    font-size:clamp(36px, 6vw, 58px);
+    line-height:.98;
+    font-weight:800;
+    letter-spacing:-.045em;
+    text-wrap:balance;
+    overflow-wrap:anywhere;
+  }
+  .tagline{
+    max-width:600px;
+    margin:18px 0 0;
+    color:#c7d8e9;
+    font-size:clamp(15px, 2vw, 18px);
+    line-height:1.6;
+  }
+  .progress-panel{
+    position:relative;
+    margin-top:34px;
+    padding:18px 20px 16px;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:18px;
+    background:rgba(4, 19, 33, .3);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  }
+  .progress-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
+  .progress-title{font-size:13px;font-weight:750;color:#fff;}
+  .score-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:30px;
+    padding:5px 10px;
+    border-radius:999px;
+    color:#d8e8f7;
+    background:rgba(255,255,255,.08);
+    font-size:12px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+  }
+  .score-pill svg{color:#75d99a;}
+  .dock{
+    position:relative;
+    height:8px;
+    margin:0 16px;
+    background:rgba(255,255,255,.13);
+    border-radius:999px;
+  }
+  .dock-fill{
+    height:100%;
+    width:0;
+    border-radius:inherit;
+    background:linear-gradient(90deg, #31a9f8, #6d8cff);
+    box-shadow:0 0 16px rgba(49,169,248,.45);
+    transition:width .55s var(--ease);
+  }
+  .dock-crate{
+    position:absolute;
+    top:50%;
+    left:0;
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    color:var(--navy);
+    background:#fff;
+    border:3px solid #75c7ff;
+    border-radius:10px;
+    box-shadow:0 7px 20px rgba(0,0,0,.28);
+    transform:translate(-50%, -50%);
+    transition:left .55s var(--ease);
+  }
+  .dock-meta{
+    display:flex;
+    justify-content:space-between;
+    gap:16px;
+    margin-top:15px;
+    color:#9fb5ca;
+    font-size:12px;
+    font-weight:650;
+    font-variant-numeric:tabular-nums;
+  }
+  .mission-dots{display:flex;align-items:center;gap:6px;}
+  .mission-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);transition:width .35s var(--ease), background-color .35s ease;}
+  .mission-dot.done{background:#54c6ff;}
+  .mission-dot.active{width:22px;border-radius:8px;background:#fff;}
+
+  /* ---- Mission card ---- */
+  #stage{scroll-margin-top:20px;}
+  .card{
+    position:relative;
+    margin-top:24px;
+    padding:clamp(24px, 5vw, 44px);
+    overflow:hidden;
+    background:var(--surface);
+    border:1px solid rgba(203,214,227,.92);
+    border-radius:var(--radius-lg);
+    box-shadow:var(--shadow-lg);
+    animation:card-in .42s var(--ease) both;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:5px;
+    background:linear-gradient(180deg, var(--docker), var(--k8s));
+  }
+  .card.no-entry{animation:none;}
+  .level-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;}
+  .level-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:30px;
+    padding:6px 11px;
+    border:1px solid #cddafd;
+    border-radius:999px;
+    color:#234fb2;
+    background:#eff4ff;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  .level-tag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--k8s);box-shadow:0 0 0 3px rgba(49,95,212,.12);}
+  .level-tag.docker{color:#0a69ad;border-color:#bcdff6;background:#edf8ff;}
+  .level-tag.docker::before{background:var(--docker);box-shadow:0 0 0 3px rgba(22,134,217,.13);}
+  .mission-count{color:var(--ink-faint);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;}
+  h2.qtitle{
+    max-width:720px;
+    margin:0 0 10px;
+    color:var(--ink);
+    font-size:clamp(24px, 4vw, 34px);
+    line-height:1.18;
+    font-weight:790;
+    letter-spacing:-.032em;
+    text-wrap:balance;
+  }
+  p.prompt{
+    max-width:760px;
+    margin:0 0 28px;
+    color:var(--ink-soft);
+    font-size:15.5px;
+    line-height:1.65;
+  }
+  .section-label{
+    display:block;
+    margin:0 0 10px;
+    color:var(--ink-faint);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .section-hint{display:block;margin:-3px 0 12px;color:var(--ink-faint);font-size:12px;line-height:1.5;}
+  code.inline{
+    padding:2px 6px;
+    border:1px solid #d8e1eb;
+    border-radius:6px;
+    color:#18334c;
+    background:#f3f6f9;
+    font-family:var(--mono);
+    font-size:.9em;
+    overflow-wrap:anywhere;
+  }
+
+  /* ---- Order builder ---- */
+  .sequence{
+    min-height:88px;
+    display:flex;
+    flex-wrap:wrap;
+    align-content:flex-start;
+    align-items:flex-start;
+    gap:9px;
+    margin-bottom:24px;
+    padding:16px;
+    border:1.5px dashed #a8bdd3;
+    border-radius:var(--radius-md);
+    background:linear-gradient(135deg, #f8fbfe, #f2f7fc);
+  }
+  .bank{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px;}
+  .chip{
+    min-height:44px;
+    padding:10px 13px;
+    border:1px solid var(--line-strong);
+    border-radius:11px;
+    color:#26384a;
+    background:var(--surface);
+    box-shadow:0 1px 1px rgba(15,35,55,.03);
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.35;
+    cursor:pointer;
+    transition:border-color .18s ease, box-shadow .18s ease, transform .18s var(--ease), opacity .18s ease;
+  }
+  .chip:not(:disabled):hover{border-color:#80a8cf;box-shadow:0 7px 17px rgba(24,60,96,.1);transform:translateY(-2px);}
+  .chip:active:not(:disabled){transform:translateY(0);}
+  .chip.used{opacity:.35;cursor:not-allowed;}
+  .sequence .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:40px;
+    padding:8px 10px 8px 8px;
+    border-color:#c7d9eb;
+    color:#163754;
+    background:#fff;
+    cursor:pointer;
+  }
+  .sequence .chip .num{
+    display:inline-grid;
+    place-items:center;
+    flex:0 0 auto;
+    width:23px;
+    height:23px;
+    border-radius:7px;
+    color:#fff;
+    background:var(--k8s);
+    font-family:ui-sans-serif, sans-serif;
+    font-size:10px;
+    font-weight:800;
+  }
+  .remove-icon{width:14px;height:14px;color:#7790a8;}
+  .placeholder{align-self:center;color:var(--ink-faint);font-size:13px;line-height:1.55;}
+
+  /* ---- MCQ / match / fill ---- */
+  .options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+  .option{
+    position:relative;
+    width:100%;
+    min-height:54px;
+    padding:14px 46px 14px 16px;
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    color:#26384a;
+    background:var(--surface);
+    font-size:14px;
+    line-height:1.5;
+    text-align:left;
+    cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s var(--ease);
+  }
+  .option::after{
+    content:"";
+    position:absolute;
+    right:17px;
+    top:50%;
+    width:18px;
+    height:18px;
+    border:1.5px solid #b8c5d3;
+    border-radius:50%;
+    transform:translateY(-50%);
+  }
+  .option:not(:disabled):hover{border-color:#77a7d2;background:#fafdff;box-shadow:0 7px 18px rgba(24,60,96,.08);transform:translateY(-1px);}
+  .option.selected{border-color:var(--k8s);background:#f0f5ff;box-shadow:0 0 0 3px rgba(49,95,212,.08);}
+  .option.selected::after{border:5px solid var(--k8s);}
+  .option.correct{border-color:#63b983;background:var(--good-bg);color:#175a31;}
+  .option.correct::after{content:"\2713";display:grid;place-items:center;border:0;color:#fff;background:var(--good);font-size:12px;font-weight:900;}
+  .option.incorrect{border-color:#e0a39d;background:var(--bad-bg);color:#8f251c;}
+  .option.incorrect::after{content:"\00d7";display:grid;place-items:center;border:0;color:#fff;background:var(--bad);font-size:15px;font-weight:900;}
+  .option:disabled{cursor:default;opacity:1;}
+  .match-grid{display:grid;grid-template-columns:minmax(0, .8fr) minmax(0, 1.2fr);gap:14px 18px;margin-bottom:24px;}
+  .match-column{display:flex;flex-direction:column;gap:9px;min-width:0;}
+  .match-title{margin:0 0 2px;color:var(--ink-faint);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+  .match-item{
+    width:100%;
+    min-height:58px;
+    padding:12px 14px;
+    border:1.5px solid var(--line);
+    border-radius:13px;
+    color:#33475b;
+    background:var(--surface);
+    font-size:13px;
+    line-height:1.45;
+    text-align:left;
+    cursor:pointer;
+    transition:border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s var(--ease);
+  }
+  .match-item:not(:disabled):hover{border-color:#80a8cf;box-shadow:0 6px 16px rgba(24,60,96,.08);transform:translateY(-1px);}
+  .match-item.selected{border-color:var(--k8s);background:#eff4ff;box-shadow:0 0 0 3px rgba(49,95,212,.09);}
+  .match-item.matched{border-color:#78c593;background:var(--good-bg);color:#175a31;cursor:default;}
+  .match-item.shake{border-color:#e09a93;background:var(--bad-bg);animation:shake .32s ease;}
+  .manifest{
+    max-width:100%;
+    margin:0 0 18px;
+    padding:18px;
+    overflow-x:auto;
+    border:1px solid #cad8e5;
+    border-radius:var(--radius-md);
+    color:#d9e9f6;
+    background:#10283f;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.85;
+    white-space:pre;
+  }
+  .blank{
+    display:inline-block;
+    min-width:72px;
+    min-height:30px;
+    padding:3px 9px;
+    border:1.5px dashed #74bff4;
+    border-radius:7px;
+    color:#fff;
+    background:rgba(49,169,248,.14);
+    font-family:inherit;
+    font-size:inherit;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .blank:disabled{cursor:default;}
+  .picker{padding:16px;border:1px solid #d5e2ee;border-radius:16px;background:#f5f9fd;}
+  .picker .options{margin-bottom:0;}
+
+  /* ---- Actions / feedback ---- */
+  .btn-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;}
+  .btn-row.after-feedback{margin-top:16px;}
+  button.primary, button.ghost{
+    min-height:46px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    border-radius:12px;
+    font-size:14px;
+    font-weight:760;
+    cursor:pointer;
+    transition:background .18s ease, border-color .18s ease, box-shadow .18s ease, transform .18s var(--ease), opacity .18s ease;
+  }
+  button.primary{padding:12px 19px;border:1px solid #0d3357;color:#fff;background:linear-gradient(135deg, #102c49, #164f7f);box-shadow:0 8px 18px rgba(17,62,99,.2);}
+  button.primary:not(:disabled):hover{box-shadow:0 11px 24px rgba(17,62,99,.27);transform:translateY(-2px);}
+  button.primary svg{width:16px;height:16px;}
+  button.primary:disabled{border-color:#ced6df;color:#8491a0;background:#e3e8ed;box-shadow:none;cursor:not-allowed;}
+  button.ghost{padding:12px 16px;border:1px solid var(--line);color:var(--ink-soft);background:transparent;}
+  button.ghost:hover{border-color:#9eafc1;color:var(--ink);background:var(--surface-soft);}
+  .feedback{
+    display:none;
+    margin-top:20px;
+    padding:17px 18px;
+    border:1px solid;
+    border-radius:15px;
+    font-size:14px;
+    line-height:1.65;
+  }
+  .feedback.show{display:flex;align-items:flex-start;gap:12px;animation:feedback-in .28s var(--ease) both;}
+  .feedback-icon{display:grid;place-items:center;flex:0 0 auto;width:25px;height:25px;border-radius:8px;color:#fff;margin-top:1px;}
+  .feedback-icon svg{width:15px;height:15px;}
+  .feedback.good{border-color:#bee4ca;color:#175a31;background:var(--good-bg);}
+  .feedback.good .feedback-icon{background:var(--good);}
+  .feedback.bad{border-color:#f1c4bf;color:#8f251c;background:var(--bad-bg);}
+  .feedback.bad .feedback-icon{background:var(--bad);}
+  .feedback b{font-weight:800;}
+
+  /* ---- Summary ---- */
+  .summary{text-align:center;padding-block:clamp(34px, 7vw, 64px);}
+  .summary::before{width:100%;height:5px;inset:0 0 auto;background:linear-gradient(90deg,var(--docker),var(--k8s),#6d8cff);}
+  .badge{
+    width:104px;
+    height:104px;
+    display:grid;
+    place-items:center;
+    margin:0 auto 22px;
+    border:8px solid #eaf2ff;
+    border-radius:31px;
+    color:#fff;
+    background:linear-gradient(145deg,var(--docker),var(--k8s));
+    box-shadow:0 18px 34px rgba(49,95,212,.24);
+    transform:rotate(-4deg);
+  }
+  .badge svg{width:48px;height:48px;transform:rotate(4deg);}
+  .score-big{font-size:clamp(46px, 8vw, 68px);line-height:1;font-weight:820;letter-spacing:-.05em;font-variant-numeric:tabular-nums;}
+  .score-sub{margin-top:9px;color:#315fd4;font-size:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
+  .summary .prompt{margin:22px auto 26px;}
+  .summary .btn-row{justify-content:center;}
+
+  footer.credit{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    margin-top:24px;
+    color:var(--ink-faint);
+    font-size:12px;
+    line-height:1.5;
+    text-align:center;
+  }
+  footer.credit::before{content:"";width:6px;height:6px;border-radius:50%;background:#70a5ce;}
+
+  @keyframes card-in{from{opacity:0;transform:translateY(12px) scale(.995)}to{opacity:1;transform:none}}
+  @keyframes feedback-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+  @media (max-width:680px){
+    body{overflow-x:hidden;padding:14px 12px 36px;}
+    .product-bar{margin-bottom:14px;}
+    .session-pill span:last-child{display:none;}
+    header.top{border-radius:22px;}
+    .progress-panel{padding:16px 14px 14px;}
+    .card{margin-top:14px;border-radius:22px;}
+    .match-grid{grid-template-columns:1fr;gap:18px;}
+    .match-column{gap:8px;}
+    .chip{font-size:12px;}
+  }
+  @media (max-width:420px){
+    .product-bar{min-height:42px;}
+    .brand-mark{width:34px;height:34px;}
+    header.top{padding:26px 20px;}
+    .progress-top{align-items:flex-start;}
+    .dock-meta{font-size:11px;}
+    .level-head{align-items:flex-start;}
+    .card{padding:24px 20px 28px;}
+    .card::before{width:4px;}
+    .sequence{padding:12px;}
+    .btn-row{align-items:stretch;}
+    .btn-row button{flex:1 1 auto;}
+    .manifest{margin-inline:-4px;padding:14px 12px;font-size:11.5px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{scroll-behavior:auto !important;animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#stage">Skip to current mission</a>
+<div class="app">
+
+  <div class="product-bar" aria-label="Product header">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/><path d="m8 5.25 8 4.5"/>
+        </svg>
+      </span>
+      <span>Container Command</span>
+    </div>
+    <div class="session-pill"><span class="status-dot" aria-hidden="true"></span><span>Learning session active</span></div>
+  </div>
+
+  <header class="top">
+    <div class="hero-copy">
+      <div class="eyebrow">Docker to Kubernetes</div>
+      <h1>Build the mental model. Ship with confidence.</h1>
+      <p class="tagline">Seven hands-on missions that turn container concepts into practical, production-ready instincts.</p>
+    </div>
+    <div class="progress-panel">
+      <div class="progress-top">
+        <span class="progress-title">Mission progress</span>
+        <span class="score-pill" id="scoreLabel" aria-live="polite">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.1 4.7 5.1.5-3.8 3.5 1.1 5-4.5-2.6-4.5 2.6 1.1-5-3.8-3.5 5.1-.5L12 3Z"/></svg>
+          0 points
+        </span>
+      </div>
+      <div class="dock" id="dock" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0">
+        <div class="dock-fill" id="dockFill"></div>
+        <div class="dock-crate" id="dockCrate" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M7 9h10M7 15h10"/></svg>
+        </div>
+      </div>
+      <div class="dock-meta">
+        <span id="levelLabel">Mission 1 of 7</span>
+        <span class="mission-dots" id="missionDots" aria-hidden="true"></span>
+      </div>
+    </div>
+  </header>
+
+  <main id="stage" tabindex="-1"></main>
+
+  <footer class="credit">Hands-on DevOps learning · Docker fundamentals to Kubernetes orchestration</footer>
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   CONTENT — 7 missions covering Docker → Kubernetes
+--------------------------------------------------------- */
+const LEVELS = [
+  {
+    tag:"Docker", type:"order",
+    title:"Build a working Dockerfile",
+    prompt:"Click the instructions in the order Docker needs to run them, top to bottom, to containerize a small Node.js app.",
+    items:[
+      "FROM node:18-alpine",
+      "WORKDIR /app",
+      "COPY package*.json ./",
+      "RUN npm install",
+      "COPY . .",
+      "EXPOSE 3000",
+      'CMD ["node", "server.js"]'
+    ],
+    correctOrder:[0,1,2,3,4,5,6],
+    explain:"Docker reads a Dockerfile top-to-bottom. You need a base image (FROM) before anything else, a working directory (WORKDIR) before copying files into it, dependencies installed (RUN npm install) before the rest of the source lands, and CMD last — it's the command that starts the container, not a build step."
+  },
+  {
+    tag:"Docker", type:"mcq",
+    title:"Why does file order change rebuild speed?",
+    prompt:"Two engineers wrote the same Dockerfile, but ordered the COPY steps differently. Which one rebuilds faster after a plain code change (no new dependencies)?",
+    options:[
+      {text:"COPY package*.json first, RUN npm install, then COPY the rest of the source", correct:true},
+      {text:"COPY the entire project first, then RUN npm install", correct:false},
+      {text:"It makes no difference — Docker always reinstalls everything", correct:false}
+    ],
+    explain:"Docker caches each layer. If package.json is copied and installed in its own layer before the rest of the source, a later code-only change only invalidates the cache from that COPY . . line onward — npm install is skipped entirely. Copy everything at once, and any file change reruns the install."
+  },
+  {
+    tag:"Docker", type:"match",
+    title:"Match each command to what it does",
+    prompt:"Tap a command on the left, then its matching description on the right.",
+    left:["docker build .","docker run -d","docker ps","docker exec -it <id> sh","docker logs -f <id>","docker stop <id>"],
+    right:[
+      "Creates an image from a Dockerfile",
+      "Starts a container in the background",
+      "Lists running containers",
+      "Opens a shell inside a running container",
+      "Streams a container's output live",
+      "Gracefully shuts a container down"
+    ],
+    explain:"These six commands cover the full loop you'll use daily: build the image, run it, check it's alive, get inside it to debug, watch its logs, and stop it cleanly."
+  },
+  {
+    tag:"Kubernetes", type:"match",
+    title:"Know your Kubernetes objects",
+    prompt:"Match each object to its job in a cluster.",
+    left:["Pod","Deployment","Service","ConfigMap","Namespace","Ingress"],
+    right:[
+      "Smallest deployable unit — one or more containers sharing storage & network",
+      "Keeps a set of Pod replicas running and rolls out updates",
+      "Stable network endpoint that load-balances traffic to a set of Pods",
+      "Injects non-secret configuration values into Pods",
+      "Isolates groups of resources within one cluster",
+      "Routes external HTTP(S) traffic to Services based on host/path rules"
+    ],
+    explain:"A Pod is the unit that actually runs; a Deployment manages Pods for you; a Service gives them a stable address since Pods come and go; ConfigMaps and Namespaces are organizational tools; Ingress is the front door for external traffic."
+  },
+  {
+    tag:"Kubernetes", type:"fill",
+    title:"Fill in the Deployment manifest",
+    prompt:"This Deployment should run 3 replicas of image myapp:v2, exposing container port 8080. Pick the correct value for each blank.",
+    template:[
+      "apiVersion: apps/v1",
+      "kind: Deployment",
+      "metadata:",
+      "  name: myapp",
+      "spec:",
+      "  replicas: __BLANK0__",
+      "  selector:",
+      "    matchLabels:",
+      "      app: myapp",
+      "  template:",
+      "    spec:",
+      "      containers:",
+      "        - name: myapp",
+      "          image: __BLANK1__",
+      "          ports:",
+      "            - containerPort: __BLANK2__"
+    ],
+    blanks:[
+      {options:["1","3","true"], correct:"3"},
+      {options:["myapp:v2","myapp","v2:myapp"], correct:"myapp:v2"},
+      {options:["80","3000","8080"], correct:"8080"}
+    ],
+    explain:"replicas controls how many identical Pods the Deployment keeps alive, image points at the exact tag to pull, and containerPort must match the port your app actually listens on inside the container — get that wrong and traffic has nowhere to land."
+  },
+  {
+    tag:"Kubernetes", type:"mcq",
+    title:"Traffic just spiked 5x",
+    prompt:"Your app's Deployment is currently running 3 replicas and response times are climbing fast. What's the quickest safe fix?",
+    options:[
+      {text:"kubectl scale deployment myapp --replicas=10", correct:true},
+      {text:"kubectl delete deployment myapp and recreate it with more replicas", correct:false},
+      {text:"docker run more containers manually on the same node", correct:false}
+    ],
+    explain:"kubectl scale changes the desired replica count in place — Kubernetes schedules the extra Pods across the cluster with zero downtime. Deleting the Deployment drops all traffic first; running raw `docker run` bypasses the scheduler entirely and Kubernetes won't manage those containers."
+  },
+  {
+    tag:"Kubernetes", type:"mcq",
+    title:"CrashLoopBackOff — what now?",
+    prompt:"`kubectl get pods` shows myapp-7f9c CrashLoopBackOff. What's the right first move to find out why?",
+    options:[
+      {text:"kubectl logs myapp-7f9c --previous", correct:true},
+      {text:"kubectl delete pod myapp-7f9c immediately", correct:false},
+      {text:"Restart the whole cluster", correct:false}
+    ],
+    explain:"CrashLoopBackOff means the container keeps starting and dying. `kubectl logs --previous` shows the output from the crashed instance — usually an error message pointing straight at the cause. Deleting the Pod just makes Kubernetes recreate it and crash again; restarting the cluster fixes nothing and destroys evidence."
+  }
+];
+
+/* ---------------------------------------------------------
+   STATE
+--------------------------------------------------------- */
+let current = 0;
+let score = 0;
+const maxScore = LEVELS.length;
+let levelAnswered = false;
+
+const stage = document.getElementById('stage');
+const dock = document.getElementById('dock');
+const dockFill = document.getElementById('dockFill');
+const dockCrate = document.getElementById('dockCrate');
+const levelLabel = document.getElementById('levelLabel');
+const scoreLabel = document.getElementById('scoreLabel');
+const missionDots = document.getElementById('missionDots');
+
+const ICONS = {
+  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>`,
+  alert:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/></svg>`,
+  arrow:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
+  close:`<svg class="remove-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m7 7 10 10M17 7 7 17"/></svg>`
+};
+
+function updateHeader(){
+  const pct = (current/LEVELS.length)*100;
+  dockFill.style.width = pct + "%";
+  dockCrate.style.left = pct + "%";
+  dock.setAttribute('aria-valuenow', Math.min(current, LEVELS.length));
+  levelLabel.textContent = current < LEVELS.length
+    ? `Mission ${current+1} of ${LEVELS.length}`
+    : "Complete";
+  scoreLabel.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 2.1 4.7 5.1.5-3.8 3.5 1.1 5-4.5-2.6-4.5 2.6 1.1-5-3.8-3.5 5.1-.5L12 3Z"/></svg>${score} ${score === 1 ? 'point' : 'points'}`;
+  missionDots.innerHTML = LEVELS.map((_, index)=>{
+    const state = index < current ? 'done' : index === current ? 'active' : '';
+    return `<span class="mission-dot ${state}"></span>`;
+  }).join('');
+}
+
+function render(){
+  updateHeader();
+  if(current >= LEVELS.length){ renderSummary(); return; }
+  const lvl = LEVELS[current];
+  levelAnswered = false;
+  if(lvl.type === "order") renderOrder(lvl);
+  else if(lvl.type === "mcq") renderMcq(lvl);
+  else if(lvl.type === "match") renderMatch(lvl);
+  else if(lvl.type === "fill") renderFill(lvl);
+}
+
+function levelHeader(lvl){
+  return `
+    <div class="level-head">
+      <div class="level-tag ${lvl.tag==='Docker'?'docker':''}">${lvl.tag}</div>
+      <span class="mission-count">${String(current+1).padStart(2,'0')} / ${String(LEVELS.length).padStart(2,'0')}</span>
+    </div>
+    <h2 class="qtitle" tabindex="-1">${lvl.title}</h2>
+    <p class="prompt">${lvl.prompt}</p>
+  `;
+}
+
+function feedbackBlock(isGood, text){
+  return `<div class="feedback show ${isGood?'good':'bad'}" role="status" aria-live="polite">
+    <span class="feedback-icon">${isGood ? ICONS.check : ICONS.alert}</span>
+    <div><b>${isGood?'Correct — here\'s why:':'Not quite — here\'s why:'}</b> ${text}</div>
+  </div>`;
+}
+
+function nextButtonRow(disabled){
+  return `<div class="btn-row after-feedback">
+    <button class="primary" id="nextBtn" ${disabled?'disabled':''}>${current === LEVELS.length-1 ? 'See results' : 'Next mission'} ${ICONS.arrow}</button>
+  </div>`;
+}
+
+/* ---- ORDER type ---- */
+function renderOrder(lvl){
+  const shuffled = lvl.items.map((t,i)=>({t,i})).sort(()=>Math.random()-0.5);
+  let sequence = [];
+  let hasDrawn = false;
+
+  function draw(){
+    stage.innerHTML = `
+      <div class="card ${hasDrawn ? 'no-entry' : ''}">
+        ${levelHeader(lvl)}
+        <span class="section-label">Your Dockerfile</span>
+        <div class="sequence" id="seq" aria-live="polite">
+          ${sequence.length ? sequence.map((idx,pos)=>`<button class="chip" type="button" data-seq-pos="${pos}" aria-label="Remove step ${pos+1}: ${lvl.items[idx]}"><span class="num">${pos+1}</span><span>${lvl.items[idx]}</span>${ICONS.close}</button>`).join('') : '<span class="placeholder">Your build sequence will appear here. Choose each instruction in the order it should run.</span>'}
+        </div>
+        <span class="section-label">Available instructions</span>
+        <span class="section-hint">Select a command to add it. Select a placed command to remove it.</span>
+        <div class="bank" id="bank">
+          ${shuffled.map(({t,i})=>`<button type="button" class="chip ${sequence.includes(i)?'used':''}" data-i="${i}" ${sequence.includes(i)?'disabled':''}>${t}</button>`).join('')}
+        </div>
+        <div class="btn-row">
+          <button class="primary" id="checkBtn" ${sequence.length===lvl.items.length?'':'disabled'}>Check order</button>
+          <button class="ghost" id="resetBtn">Reset</button>
+        </div>
+        <div id="fbSlot"></div>
+      </div>
+    `;
+    hasDrawn = true;
+    stage.querySelectorAll('#bank .chip').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        if(levelAnswered) return;
+        const i = parseInt(chip.dataset.i);
+        if(sequence.includes(i)) return;
+        sequence.push(i);
+        draw();
+      });
+    });
+    stage.querySelectorAll('#seq [data-seq-pos]').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        if(levelAnswered) return;
+        sequence.splice(parseInt(chip.dataset.seqPos), 1);
+        draw();
+      });
+    });
+    const resetBtn = stage.querySelector('#resetBtn');
+    if(resetBtn) resetBtn.addEventListener('click', ()=>{ if(levelAnswered) return; sequence=[]; draw(); });
+    const checkBtn = stage.querySelector('#checkBtn');
+    if(checkBtn) checkBtn.addEventListener('click', ()=>{
+      levelAnswered = true;
+      const isGood = JSON.stringify(sequence) === JSON.stringify(lvl.correctOrder);
+      if(isGood) score++;
+      document.getElementById('fbSlot').innerHTML = feedbackBlock(isGood, lvl.explain) + nextButtonRow(false);
+      document.getElementById('nextBtn').addEventListener('click', advance);
+      checkBtn.disabled = true;
+      stage.querySelectorAll('.chip').forEach(chip=>chip.disabled = true);
+      updateHeader();
+    });
+  }
+  draw();
+}
+
+/* ---- MCQ type ---- */
+function renderMcq(lvl){
+  stage.innerHTML = `
+    <div class="card">
+      ${levelHeader(lvl)}
+      <span class="section-label">Choose one answer</span>
+      <div class="options" id="opts" role="group" aria-label="Answer choices">
+        ${lvl.options.map((o,i)=>`<button type="button" class="option" data-i="${i}">${o.text}</button>`).join('')}
+      </div>
+      <div id="fbSlot"></div>
+    </div>
+  `;
+  stage.querySelectorAll('.option').forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      if(levelAnswered) return;
+      levelAnswered = true;
+      const i = parseInt(opt.dataset.i);
+      const isGood = lvl.options[i].correct;
+      stage.querySelectorAll('.option').forEach((o,j)=>{
+        if(lvl.options[j].correct) o.classList.add('correct');
+        else if(j===i) o.classList.add('incorrect');
+        o.disabled = true;
+      });
+      if(isGood) score++;
+      document.getElementById('fbSlot').innerHTML = feedbackBlock(isGood, lvl.explain) + nextButtonRow(false);
+      document.getElementById('nextBtn').addEventListener('click', advance);
+      updateHeader();
+    });
+  });
+}
+
+/* ---- MATCH type ---- */
+function renderMatch(lvl){
+  const n = lvl.left.length;
+  const rightOrder = lvl.right.map((t,i)=>i).sort(()=>Math.random()-0.5);
+  let selLeft = null, selRight = null;
+  let matched = new Set();
+  let mistakes = 0;
+  let matchingLocked = false;
+
+  stage.innerHTML = `
+    <div class="card">
+      ${levelHeader(lvl)}
+      <span class="section-hint">Pick one item from each column. Correct pairs lock into place.</span>
+      <div class="match-grid">
+        <div class="match-column" id="leftCol" role="group" aria-label="Items to match">
+          <p class="match-title">${lvl.tag === 'Docker' ? 'Command' : 'Object'}</p>
+          ${lvl.left.map((t,i)=>`<button type="button" class="match-item" data-side="l" data-i="${i}"><code class="inline">${t}</code></button>`).join('')}
+        </div>
+        <div class="match-column" id="rightCol" role="group" aria-label="Matching descriptions">
+          <p class="match-title">Description</p>
+          ${rightOrder.map(i=>`<button type="button" class="match-item" data-side="r" data-i="${i}">${lvl.right[i]}</button>`).join('')}
+        </div>
+      </div>
+      <div id="fbSlot"></div>
+    </div>
+  `;
+
+  function checkComplete(){
+    if(matched.size === n){
+      levelAnswered = true;
+      const isGood = mistakes === 0;
+      if(isGood) score++;
+      const msg = isGood
+        ? lvl.explain
+        : lvl.explain + " You got there with a couple of tries — that repetition is exactly how these pairings stick.";
+      document.getElementById('fbSlot').innerHTML = feedbackBlock(isGood, msg) + nextButtonRow(false);
+      document.getElementById('nextBtn').addEventListener('click', advance);
+      updateHeader();
+    }
+  }
+
+  stage.querySelectorAll('.match-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      if(levelAnswered || matchingLocked) return;
+      const side = item.dataset.side, i = parseInt(item.dataset.i);
+      if(item.classList.contains('matched')) return;
+      if(side==='l'){
+        if(selLeft) selLeft.classList.remove('selected');
+        selLeft = item; item.classList.add('selected');
+      } else {
+        if(selRight) selRight.classList.remove('selected');
+        selRight = item; item.classList.add('selected');
+      }
+      if(selLeft && selRight){
+        const li = parseInt(selLeft.dataset.i), ri = parseInt(selRight.dataset.i);
+        if(li === ri){
+          selLeft.classList.remove('selected'); selRight.classList.remove('selected');
+          selLeft.classList.add('matched'); selRight.classList.add('matched');
+          selLeft.disabled = true; selRight.disabled = true;
+          matched.add(li);
+          selLeft = null; selRight = null;
+          checkComplete();
+        } else {
+          mistakes++;
+          matchingLocked = true;
+          selLeft.classList.add('shake'); selRight.classList.add('shake');
+          setTimeout(()=>{
+            selLeft && selLeft.classList.remove('selected','shake');
+            selRight && selRight.classList.remove('selected','shake');
+            selLeft = null; selRight = null;
+            matchingLocked = false;
+          }, 500);
+        }
+      }
+    });
+  });
+}
+
+/* ---- FILL type ---- */
+function renderFill(lvl){
+  let chosen = lvl.blanks.map(()=>null);
+  let hasDrawn = false;
+
+  function draw(){
+    const codeLines = lvl.template.map(line=>{
+      return line.replace(/__BLANK(\d)__/g, (m,d)=>{
+        const idx = parseInt(d);
+        const val = chosen[idx];
+        return `<button type="button" class="blank" data-idx="${idx}" aria-label="Choose value for blank ${idx+1}">${val ? val : '?'}</button>`;
+      });
+    }).join('\n');
+
+    stage.innerHTML = `
+      <div class="card ${hasDrawn ? 'no-entry' : ''}">
+        ${levelHeader(lvl)}
+        <span class="section-label">Deployment.yaml</span>
+        <pre class="manifest" aria-label="Kubernetes deployment manifest">${codeLines}</pre>
+        <div id="pickerSlot"></div>
+        <div class="btn-row after-feedback">
+          <button class="primary" id="checkBtn" ${chosen.every(c=>c!==null) ? '' : 'disabled'}>Check manifest</button>
+        </div>
+        <div id="fbSlot"></div>
+      </div>
+    `;
+    hasDrawn = true;
+    stage.querySelectorAll('.blank').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(levelAnswered) return;
+        const idx = parseInt(b.dataset.idx);
+        showPicker(idx);
+      });
+    });
+    const checkBtn = stage.querySelector('#checkBtn');
+    if(checkBtn) checkBtn.addEventListener('click', ()=>{
+      levelAnswered = true;
+      const isGood = lvl.blanks.every((b,i)=>chosen[i]===b.correct);
+      if(isGood) score++;
+      document.getElementById('fbSlot').innerHTML = feedbackBlock(isGood, lvl.explain) + nextButtonRow(false);
+      document.getElementById('nextBtn').addEventListener('click', advance);
+      checkBtn.disabled = true;
+      stage.querySelectorAll('.blank').forEach(blank=>blank.disabled = true);
+      updateHeader();
+    });
+  }
+
+  function showPicker(idx){
+    const opts = lvl.blanks[idx].options;
+    document.getElementById('pickerSlot').innerHTML = `
+      <div class="picker">
+        <span class="section-label">Choose a value for blank ${idx+1}</span>
+        <div class="options" role="group" aria-label="Values for blank ${idx+1}">
+          ${opts.map(o=>`<button type="button" class="option" data-v="${o}">${o}</button>`).join('')}
+        </div>
+      </div>
+    `;
+    document.querySelectorAll('#pickerSlot .option').forEach(opt=>{
+      opt.addEventListener('click', ()=>{
+        chosen[idx] = opt.dataset.v;
+        document.getElementById('pickerSlot').innerHTML = '';
+        draw();
+      });
+    });
+  }
+
+  draw();
+}
+
+/* ---- ADVANCE / SUMMARY ---- */
+function advance(){
+  current++;
+  render();
+  requestAnimationFrame(()=>stage.querySelector('.qtitle')?.focus());
+}
+
+function renderSummary(){
+  const pct = Math.round((score/maxScore)*100);
+  let title;
+  if(pct === 100) title = "DevOps Master";
+  else if(pct >= 70) title = "Kubernetes Captain";
+  else if(pct >= 40) title = "Docker Navigator";
+  else title = "Container Cadet";
+
+  stage.innerHTML = `
+    <div class="card summary">
+      <div class="badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h8v5a4 4 0 0 1-8 0V3Z"/><path d="M12 12v5M8 21h8M9 17h6M8 5H4v2a4 4 0 0 0 4 4M16 5h4v2a4 4 0 0 1-4 4"/></svg>
+      </div>
+      <h2 class="qtitle" tabindex="-1">Mission complete</h2>
+      <div class="score-big">${score} / ${maxScore}</div>
+      <div class="score-sub">${title}</div>
+      <p class="prompt">
+        ${pct === 100
+          ? "Clean sweep — you moved from Dockerfile ordering to debugging a live cluster without a wrong turn."
+          : "Every mission you missed has its explanation sitting right above — worth a re-read before you replay."}
+      </p>
+      <div class="btn-row">
+        <button class="primary" id="replayBtn">Run the missions again ${ICONS.arrow}</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('replayBtn').addEventListener('click', ()=>{
+    current = 0; score = 0;
+    render();
+    requestAnimationFrame(()=>stage.querySelector('.qtitle')?.focus());
+  });
+}
+
+render();
+</script>
+</body>
+</html>

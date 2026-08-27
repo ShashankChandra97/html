@@ -1,0 +1,34 @@
+# Generated Graphify output and local integration files
+graphify-out/
+.vscode/graphify-mcp-server.js
+.vscode/graphify-mcp-server.test.js
+.vscode/mcp.json
+
+# Local AI assistant configuration and downloaded skills
+.agents/
+.codex/
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+
+# Private CloudVeyra implementation (kept in ../cloudveyra)
+projects/cloudveyra/app.html
+projects/cloudveyra/css/legacy.css
+projects/cloudveyra/js/azure-api.js
+projects/cloudveyra/live/
+projects/cloudveyra/private/
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+
+# Logs and temporary editor files
+*.log
+*.tmp
+*.swp
+*~
+
+# Local historical snapshots are stored outside this public repository
+archive/

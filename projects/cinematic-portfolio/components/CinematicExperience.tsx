@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PlatformCore } from "./PlatformCore";
 import { withBasePath } from "@/lib/basePath";
 import { experiences, skills, projects, education, certifications, contact } from "@/lib/portfolioContent";
@@ -11,18 +11,19 @@ const Arrow = () => <svg viewBox="0 0 24 24" width="18" height="18" fill="none" 
 
 export function CinematicExperience() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuButton = useRef<HTMLButtonElement>(null);
   return (
     <>
       <a className="skip-link" href="#main-content">Skip to content</a>
       <PlatformCore />
       <div className="scene-scrim" aria-hidden="true" />
-      <header className="site-header">
+      <header className="site-header" onKeyDown={(event) => { if (event.key === "Escape" && menuOpen) { setMenuOpen(false); menuButton.current?.focus(); } }}>
         <a className="wordmark" href="#hero" aria-label="Shashank Chandra, home">SC<span className="wordmark-dot">.</span></a>
-        <nav aria-label="Primary navigation" className={menuOpen ? "navigation is-open" : "navigation"}>
+        <nav id="primary-navigation" aria-label="Primary navigation" className={menuOpen ? "navigation is-open" : "navigation"}>
           {chapters.map(([id, label]) => <a key={id} href={`#${id}`} onClick={() => setMenuOpen(false)}>{label}</a>)}
         </nav>
         <a className="resume-link" href={withBasePath("/resume/Shashank_Chandra_DevOps.pdf")} target="_blank" rel="noopener noreferrer">Résumé <Arrow /></a>
-        <button className="menu-button" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close" : "Menu"}</button>
+        <button ref={menuButton} className="menu-button" aria-controls="primary-navigation" aria-label={menuOpen ? "Close navigation" : "Open navigation"} aria-expanded={menuOpen} onClick={() => setMenuOpen(!menuOpen)}>{menuOpen ? "Close" : "Menu"}</button>
       </header>
       <main id="main-content">
         <section id="hero" className="chapter hero" data-core-phase="0" aria-labelledby="hero-title">

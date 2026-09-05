@@ -169,3 +169,68 @@ h2 { font-weight:500; font-size:clamp(39px,4.2vw,66px); }
 /* A static scene must never compete with an alternating reading column. */
 .platform-stage[data-renderer="fallback"] { opacity:.22; }
 @media(prefers-reduced-motion:reduce) { .platform-stage { opacity:.18; } }
+
+/* Mobile uses a dedicated, continuously visible sculpture viewport. Content
+   scrolls below it, rather than painting opaque section backgrounds over it. */
+@media (max-width:767px), (pointer:coarse) and (max-width:1024px) {
+  :root { --mobile-header:calc(64px + env(safe-area-inset-top, 0px)); --mobile-stage:clamp(170px,29svh,260px); --gutter:clamp(20px,5vw,36px); }
+  html { scroll-padding-top:calc(var(--mobile-header) + var(--mobile-stage) + 24px); }
+  .site-header { height:var(--mobile-header); padding:env(safe-area-inset-top,0px) var(--gutter) 0; gap:20px; background:var(--bg); }
+  .wordmark { margin-right:auto; font-size:27px; min-width:44px; }
+  .resume-link { min-height:44px; font-size:12px; gap:9px; }
+  .menu-button { display:block; min-height:44px; min-width:54px; padding:0 12px; border:1px solid var(--line); border-radius:6px; background:white; font-size:12px; }
+  .navigation { display:none; position:absolute; top:var(--mobile-header); left:0; right:0; padding:16px var(--gutter) 24px; margin:0; background:var(--bg); border-bottom:1px solid var(--line); box-shadow:0 15px 25px #24456712; }
+  .navigation.is-open { display:grid; grid-template-columns:1fr 1fr; gap:8px 22px; }
+  .navigation a { display:flex; align-items:center; min-height:44px; padding:10px 0; font-size:15px; }
+  .platform-stage { inset:var(--mobile-header) 0 auto; height:var(--mobile-stage); z-index:5; border-bottom:1px solid var(--line); background:radial-gradient(ellipse at 50% 45%,#e5f0ff,#f6f8fc 75%); }
+  .platform-fallback { width:min(100%,420px); height:100%; aspect-ratio:auto; top:0; left:50%; right:auto; transform:translateX(-50%); }
+  .platform-stage[data-renderer="fallback"] { opacity:1; }
+  main { padding-top:calc(var(--mobile-header) + var(--mobile-stage) + 24px); }
+  .chapter, .chapter.hero, .chapter.projects, .project-chapter { min-height:0; padding:48px var(--gutter) 64px; background:transparent; margin:0; }
+  .hero-topline { position:static; font-size:9px; letter-spacing:.6px; margin-bottom:22px; flex-wrap:wrap; }
+  .hero-content { margin:0; max-width:100%; }
+  .eyebrow { font-size:14px; margin-bottom:16px; }
+  h1 { font-size:clamp(44px,11.6vw,76px); line-height:1.02; margin-bottom:24px; }
+  h2 { font-size:clamp(33px,8.5vw,55px); line-height:1.1; margin-bottom:28px; overflow-wrap:break-word; }
+  .section-heading, .reading-column { width:100%; max-width:none; }
+  .content-right > .section-heading, .content-right > .reading-column { margin-left:0; }
+  .intro, .reading-column>p, .project p, .experience-item li, .skills-list p { font-size:15px; line-height:1.75; }
+  .reading-column .large-copy { font-size:20px; line-height:1.5; }
+  .intro { max-width:100%; }
+  .actions { flex-wrap:wrap; gap:12px 22px; }
+  .button,.text-link { font-size:13px; min-height:48px; }
+  .object-caption { display:none; }
+  .hero-bottom { position:static; margin-top:36px; padding-top:20px; font-size:10px; gap:16px; flex-wrap:wrap; }
+  .hero-bottom>span { max-width:none; }
+  .hero-bottom a { min-height:44px; align-items:center; }
+  .chapter-number { font-size:10px; margin-bottom:22px; }
+  .experience-item { padding:24px 0 36px; }
+  .item-overline { flex-wrap:wrap; font-size:11px; }
+  .company { font-size:13px; }
+  .tags span { font-size:10px; }
+  .skills-list article { gap:18px; padding:24px 0; }
+  .project-chapter { padding:20px 0 52px; }
+  .projects>.section-heading { background:transparent; padding-bottom:8px; }
+  .project-chapter .reading-column { padding:24px; background:#ffffffb8; }
+  .project-overline { flex-wrap:wrap; font-size:10px; margin-bottom:24px; }
+  .project h3 { font-size:clamp(28px,7.5vw,39px); overflow-wrap:anywhere; }
+  .project-link { font-size:14px; }
+  .certifications { flex-direction:column; }
+  .certifications a { flex:auto; padding:22px; min-height:80px; }
+  .certifications strong { font-size:16px; }
+  .certifications small { font-size:13px; }
+  .contact-links { gap:8px 24px; }
+  .contact-links a { font-size:14px; }
+  .site-footer { padding:24px var(--gutter) max(36px,env(safe-area-inset-bottom,0px)); }
+  .site-footer>div { align-items:flex-start; flex-direction:column; }
+  .site-footer a { overflow-wrap:anywhere; min-height:44px; }
+  .site-footer>div>a:last-child { font-size:13px; }
+}
+@media (max-height:500px) and (max-width:1024px) and (pointer:coarse) {
+  :root { --mobile-header:52px; --mobile-stage:120px; }
+  .site-header { gap:16px; }
+  .chapter,.chapter.hero { padding-top:28px; }
+}
+@media (prefers-reduced-motion:reduce) and (max-width:767px), (prefers-reduced-motion:reduce) and (pointer:coarse) and (max-width:1024px) {
+  .platform-stage { opacity:1; }
+}

@@ -1,0 +1,22 @@
+{
+  "result": "pass",
+  "formations": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "local_html_links_assets": 13,
+  "static_chunks_fonts": 14,
+  "pdf_bytes": 110155,
+  "pdf_sha256": "4f4e9a89537ea53d61966d09b35a1c55ead32372f65eff921a6ea73af36fa8cf",
+  "removed_showcases_absent": true,
+  "build_footer_absent": true,
+  "backend_calls_in_active_source": false,
+  "browser_visual_motion_checks": "not completed; native control timeouts and active user browser changes"
+}

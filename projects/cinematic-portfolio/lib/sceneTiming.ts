@@ -2,9 +2,9 @@ export type ContentAnchor = { top: number; phase: number };
 export type SceneTransition = { start: number; end: number; phase: number };
 
 /** Settle with the visible heading, including the section's real content padding. */
-export function buildSceneTransitions(anchors: ContentAnchor[], viewportHeight: number, headerHeight: number, maxScroll: number): SceneTransition[] {
-  const readingLine = Math.max(headerHeight + 24, viewportHeight * .18);
-  const distance = viewportHeight * 1.4;
+export function buildSceneTransitions(anchors: ContentAnchor[], viewportHeight: number, headerHeight: number, maxScroll: number, stageHeight = 0): SceneTransition[] {
+  const readingLine = Math.max(headerHeight + stageHeight + 24, viewportHeight * .18);
+  const distance = (stageHeight > 0 ? Math.max(160, viewportHeight - headerHeight - stageHeight) : viewportHeight) * 1.4;
   let previousEnd = 0;
   return anchors.map((anchor, index) => {
     const end = index === 0 ? 0 : Math.max(previousEnd, Math.min(maxScroll, Math.max(0, anchor.top - readingLine)));

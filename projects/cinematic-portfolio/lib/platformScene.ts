@@ -3,6 +3,7 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import gsap from "gsap";
 import { createFormations } from "./coreFormations";
+import { mobileCameraDistance } from "./mobileFraming";
 import { buildSceneTransitions, phaseAtScroll, type SceneTransition } from "./sceneTiming";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -63,6 +64,7 @@ export function createPlatformScene(host: HTMLDivElement, options: SceneOptions)
 
   const count = 1800;
   const states = createFormations(count);
+  const modulePositions = Array.from({ length: count }, () => new THREE.Vector3());
   const chassis = new THREE.InstancedMesh(chassisGeometry, chassisMaterial, count);
   const panels = new THREE.InstancedMesh(panelGeometry, panelMaterial, count * 6);
   const seams = new THREE.InstancedMesh(seamGeometry, seamMaterial, count * 6);
@@ -159,6 +161,7 @@ export function createPlatformScene(host: HTMLDivElement, options: SceneOptions)
       object.position.x += Math.sin(i*2.399)*flight*.46;
       object.position.y += Math.cos(i*1.618)*flight*.38;
       object.position.z += Math.sin(i*.73)*flight*.85;
+      modulePositions[i].copy(object.position);
       object.quaternion.setFromEuler(new THREE.Euler(flight*Math.sin(i)*1.7,flight*Math.cos(i)*1.7,0));
       object.scale.setScalar(mix(from.scale,to.scale,local)*.18);
       object.updateMatrix();
@@ -183,9 +186,12 @@ export function createPlatformScene(host: HTMLDivElement, options: SceneOptions)
     core.position.set(0, 0, currentPhase > 3 ? -(currentPhase - 3) * 0.3 : 0);
     sculpture.quaternion.slerpQuaternions(sceneRotations[index], sceneRotations[index + 1], blend);
     camera.position.lerpVectors(cameraPositions[index], cameraPositions[index + 1], blend);
-    if (mobile) camera.position.multiplyScalar(Math.max(1.2, .85 / camera.aspect));
+    if (mobile) {
+      camera.lookAt(0, 0, 0);
+      camera.position.setLength(mobileCameraDistance(modulePositions, sculpture.quaternion, camera.quaternion, camera.fov, camera.aspect));
+    }
     const side = mix(screenSides[index],screenSides[index+1],blend);
-    camera.setViewOffset(viewportWidth,viewportHeight,-viewportWidth*(mobile ? 0 : .245*side),viewportHeight*(mobile ? .24 : 0),viewportWidth,viewportHeight);
+    camera.setViewOffset(viewportWidth,viewportHeight,-viewportWidth*(mobile ? 0 : .245*side),0,viewportWidth,viewportHeight);
     camera.updateProjectionMatrix();
     camera.lookAt(0, 0, 0);
     camera.updateMatrixWorld();
@@ -206,8 +212,9 @@ export function createPlatformScene(host: HTMLDivElement, options: SceneOptions)
       .filter((anchor) => Number.isFinite(anchor.phase))
       .sort((a, b) => a.top - b.top);
     const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height ?? 88;
+    const stageHeight = mobile ? host.getBoundingClientRect().height : 0;
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    transitions = buildSceneTransitions(anchors, window.innerHeight, headerHeight, maxScroll);
+    transitions = buildSceneTransitions(anchors, window.innerHeight, headerHeight, maxScroll, stageHeight);
   }
 
   const playback = { phase: 0 };
@@ -230,14 +237,14 @@ export function createPlatformScene(host: HTMLDivElement, options: SceneOptions)
   function resize() {
     const width = Math.max(1, host.clientWidth);
     const height = Math.max(1, host.clientHeight);
-    mobile = window.innerWidth < 768;
+    mobile = window.matchMedia("(max-width: 767px), (pointer: coarse) and (max-width: 1024px)").matches;
     viewportWidth = width; viewportHeight = height;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.5));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     // A full-viewport render with an off-axis lens reserves real negative space
     // for the HTML column without moving the sculpture into a distorted frustum.
-    camera.setViewOffset(width, height, -width * (mobile ? 0.16 : 0.235), height * (mobile ? 0.1 : 0), width, height);
+    camera.setViewOffset(width, height, -width * (mobile ? 0 : 0.235), 0, width, height);
     camera.updateProjectionMatrix();
     measure();
     updateScroll(true);

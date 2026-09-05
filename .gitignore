@@ -30,5 +30,13 @@ Thumbs.db
 *.swp
 *~
 
+# JavaScript build artifacts
+**/node_modules/
+projects/cinematic-portfolio/.next/
+projects/cinematic-portfolio/out/
+projects/cinematic-portfolio/*.tsbuildinfo
+projects/cinematic-portfolio/lib/build-info.json
+projects/cinematic-portfolio/public/build-info.json
+
 # Local historical snapshots are stored outside this public repository
 archive/

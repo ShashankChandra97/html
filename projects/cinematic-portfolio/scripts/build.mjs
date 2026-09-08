@@ -5,6 +5,9 @@ import { createRequire } from "node:module";
 import { generateBuildInfo, projectRoot } from "./build-info.mjs";
 
 const require = createRequire(import.meta.url);
+for(const script of ["generate-mobile-posters.mjs"]) {
+  execFileSync(process.execPath,[resolve(projectRoot,"scripts",script)],{cwd:projectRoot,stdio:"inherit"});
+}
 const metadata = generateBuildInfo();
 console.log(`Building ${metadata.version} from ${metadata.commitShort}${metadata.dirty ? " (uncommitted changes)" : ""} at ${metadata.builtAt}`);
 execFileSync(process.execPath, [require.resolve("next/dist/bin/next"), "build"], {

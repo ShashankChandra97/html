@@ -8,7 +8,18 @@ const source = readFileSync(new URL("../lib/sceneTiming.ts", import.meta.url), "
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
 const api = {};
 runInNewContext(compiled, { exports: api });
-const { buildSceneTransitions, phaseAtScroll } = api;
+const { buildSceneTransitions, phaseAtScroll, staticPhaseAtScroll } = api;
+
+test("reduced motion uses complete reversible chapter poses without pixel flight", () => {
+  const timeline = buildSceneTransitions([{ top: 0, phase: 0 }, { top: 2000, phase: 1 }, { top: 4000, phase: 2 }], 900, 76, 5000);
+  const positions = Array.from({ length: 101 }, (_, i) => i * 50);
+  const forward = positions.map(y => staticPhaseAtScroll(timeline, y));
+  const reverse = [...positions].reverse().map(y => staticPhaseAtScroll(timeline, y)).reverse();
+  assert.deepEqual(forward, reverse);
+  assert.ok(forward.every(Number.isInteger), "no interpolated flight frames in reduced motion");
+  assert.deepEqual([...new Set(forward)], [0, 1, 2]);
+  assert.equal(staticPhaseAtScroll([], 0), 0);
+});
 
 test("padded desktop and mobile headings settle at the reading line, not on approach", () => {
   for (const { height, header, padding } of [{ height: 900, header: 88, padding: 180 }, { height: 812, header: 72, padding: 330 }]) {

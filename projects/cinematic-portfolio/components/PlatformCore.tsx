@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { withBasePath } from "@/lib/basePath";
 
 /** Decorative enhancement: the complete portfolio remains ordinary HTML. */
 export function PlatformCore() {
@@ -13,12 +14,15 @@ export function PlatformCore() {
     let cancelled = false;
     let revision = 0;
     let dispose: (() => void) | undefined;
+    const mobile = window.matchMedia("(max-width: 767px), (pointer: coarse) and (max-width: 1024px)");
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     const initialize = async () => {
       const current = ++revision;
       dispose?.();
       dispose = undefined;
+      setRenderer("loading");
+      if (mobile.matches) return;
       try {
         const { createPlatformScene } = await import("../lib/platformScene");
         if (cancelled || current !== revision) return;
@@ -34,33 +38,22 @@ export function PlatformCore() {
 
     void initialize();
     preference.addEventListener("change", initialize);
+    mobile.addEventListener("change", initialize);
     return () => {
       cancelled = true;
       revision++;
       preference.removeEventListener("change", initialize);
+      mobile.removeEventListener("change", initialize);
       dispose?.();
     };
   }, []);
 
   return (
     <div className="platform-stage" data-renderer={renderer} aria-hidden="true">
-      <svg
-        className="platform-fallback"
-        viewBox="0 0 700 700"
-        fill="none"
-        style={{ opacity: renderer === "webgl" ? 0 : 1 }}
-        focusable="false"
-      >
-        <defs>
-          <linearGradient id="cloud-silver" x1="150" y1="200" x2="510" y2="470" gradientUnits="userSpaceOnUse"><stop stopColor="#e7f3ff"/><stop offset=".48" stopColor="#9ec7ee"/><stop offset="1" stopColor="#3472a7"/></linearGradient>
-          <linearGradient id="cloud-edge" x1="200" y1="360" x2="450" y2="510" gradientUnits="userSpaceOnUse"><stop stopColor="#6ba3d5"/><stop offset="1" stopColor="#205a8f"/></linearGradient>
-        </defs>
-        <ellipse cx="350" cy="505" rx="180" ry="22" fill="#bad1e9" opacity=".2"/>
-        <path d="M175 425c-68 0-91-100-28-127 4-86 103-117 156-60 47-86 179-48 186 46 87-6 127 126 32 154H190Z" fill="url(#cloud-edge)" transform="translate(0 19)"/>
-        <path d="M175 425c-68 0-91-100-28-127 4-86 103-117 156-60 47-86 179-48 186 46 87-6 127 126 32 141H175Z" fill="url(#cloud-silver)" stroke="#719dc4" strokeWidth="2"/>
-        <g stroke="#edf7ff" strokeWidth="3" opacity=".75"><path d="M182 307h303M162 350h360M174 392h340M224 276v144M272 283v137M320 260v160M368 248v172M416 265v155M464 312v108"/></g>
-        <g fill="#2179bd"><circle cx="246" cy="371" r="5"/><circle cx="389" cy="327" r="5"/><circle cx="439" cy="371" r="5"/></g>
-      </svg>
+      <picture className="platform-fallback" style={{ opacity: renderer === "webgl" ? 0 : 1 }}>
+        <source media="(max-width: 767px), (pointer: coarse) and (max-width: 1024px)" srcSet={withBasePath("/images/mobile-model-0.webp")} />
+        <img src={withBasePath("/images/mobile-model-0.webp")} width="800" height="600" alt="" />
+      </picture>
       <div
         ref={canvasHost}
         className="platform-canvas"

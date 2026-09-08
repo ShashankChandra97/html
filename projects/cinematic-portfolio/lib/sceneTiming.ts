@@ -29,3 +29,8 @@ export function phaseAtScroll(transitions: SceneTransition[], scrollY: number): 
   }
   return previous;
 }
+
+/** Reduced motion shows complete, opaque chapter poses without any morph or flight. */
+export function staticPhaseAtScroll(transitions: SceneTransition[], scrollY: number): number {
+  return Math.round(phaseAtScroll(transitions, scrollY));
+}

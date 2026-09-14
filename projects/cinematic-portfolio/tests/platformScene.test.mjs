@@ -39,11 +39,11 @@ test("native scroll drives solid-pixel-solid poses, including Safari background 
   const dispose=createPlatformScene(host,{reducedMotion:false,onReady:()=>{ready=true;},onFailure:()=>assert.fail("scene failed")});
   assert.ok(ready);assert.equal(host.dataset.transition,"solid");
   function scroll(y,hidden=false){document.hidden=hidden;window.scrollY=y;callbacks.get("scroll")();for(const [id,fn] of [...frames]){frames.delete(id);fn();}}
-  scroll(528);assert.equal(host.dataset.phase,"0.500");assert.equal(host.dataset.transition,"pixel-flow");
+  scroll(796);assert.equal(host.dataset.phase,"0.500");assert.equal(host.dataset.transition,"pixel-flow");
   const pixelObject=scene.children.find(item=>item instanceof THREE.Group).children.find(item=>item instanceof THREE.Points);
   assert.ok(pixelObject.visible);
   scroll(1056);assert.equal(host.dataset.phase,"1.000");assert.equal(host.dataset.transition,"solid");assert.equal(pixelObject.visible,false);
-  scroll(528,true);assert.equal(host.dataset.phase,"0.500");assert.ok(pixelObject.visible,"background/accessibility scrolling must update the rendered pose");
+  scroll(796,true);assert.equal(host.dataset.phase,"0.500");assert.ok(pixelObject.visible,"background/accessibility scrolling must update the rendered pose");
   scroll(0);assert.equal(host.dataset.phase,"0.000");assert.equal(pixelObject.visible,false);
   assert.ok(renderCount>=5);
   dispose();assert.equal(callbacks.has("scroll"),false);

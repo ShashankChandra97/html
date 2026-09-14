@@ -33,9 +33,9 @@ test("padded desktop and mobile headings settle at the reading line, not on appr
   }
 });
 
-test("long chapters have a slower transition and a stable reading interval", () => {
+test("chapter transitions reserve a stable reading interval for their detailed models", () => {
   const timeline = buildSceneTransitions([{ top: 0, phase: 0 }, { top: 2000, phase: 1 }, { top: 5000, phase: 2 }], 900, 88, 6000);
-  assert.equal(timeline[2].end - timeline[2].start, 1260);
+  assert.equal(timeline[2].end - timeline[2].start, 585);
   assert.equal(phaseAtScroll(timeline, 2800), 1);
 });
 

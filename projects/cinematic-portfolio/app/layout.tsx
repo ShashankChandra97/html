@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import Script from "next/script";
+import { withBasePath } from "@/lib/basePath";
 
 const geist = localFont({ src: [
   { path: "../public/fonts/Geist-Latin.woff2", weight: "400", style: "normal" },
@@ -31,7 +33,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable} ${manrope.variable}`}>
-      <body>{children}</body>
+      <head><link rel="stylesheet" href={withBasePath("/assets/legal/notice.css")} /></head>
+      <body>{children}<noscript><div className="site-notice-fallback">Please enable JavaScript to read and agree to the site terms and privacy notice, or <a href="about:blank">exit this site</a>.</div></noscript><Script src={withBasePath("/assets/legal/notice.js")} strategy="afterInteractive" /></body>
     </html>
   );
 }

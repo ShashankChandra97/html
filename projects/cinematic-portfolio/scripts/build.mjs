@@ -5,6 +5,12 @@ import { createRequire } from "node:module";
 import { generateBuildInfo, projectRoot } from "./build-info.mjs";
 
 const require = createRequire(import.meta.url);
+// Keep the shared viewer notice identical in static demos and Next exports.
+for (const file of ["notice.css", "notice.js"]) {
+  const destination = resolve(projectRoot, "public/assets/legal", file);
+  mkdirSync(dirname(destination), { recursive: true });
+  copyFileSync(resolve(projectRoot, "../../assets/legal", file), destination);
+}
 const metadata = generateBuildInfo();
 console.log(`Building ${metadata.version} from ${metadata.commitShort}${metadata.dirty ? " (uncommitted changes)" : ""} at ${metadata.builtAt}`);
 execFileSync(process.execPath, [require.resolve("next/dist/bin/next"), "build"], {

@@ -26,5 +26,5 @@ npm run preview -- --port 4187
 Open `http://127.0.0.1:4187/html/`. The preview needs Python 3 and serves only the contents of `out/`. Omit the base-path environment variable for a root-hosted deployment. The GitHub Pages workflow uses `/html`, includes the existing browser-only demos, and uploads only `out/`.
 
 See [BUILD.md](BUILD.md) for semantic versioning, generated build metadata, and reproduction details. See [CHANGELOG.md](CHANGELOG.md) for this revision. Build metadata remains a static artifact for reproducibility; it is not displayed on the page. The visible footer contains only identity and contact links.
-
+npm 
 Typography and procedural asset provenance are documented in [ASSETS.md](ASSETS.md). The résumé link serves the user-provided PDF unchanged.

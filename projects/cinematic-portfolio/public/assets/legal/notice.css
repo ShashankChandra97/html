@@ -1,6 +1,7 @@
 html:not([data-site-notice-accepted]) body > :not(#site-notice-dialog):not(.site-notice-fallback) { visibility: hidden !important; }
 html:not([data-site-notice-accepted]) body { overflow: hidden; }
-#site-notice-dialog { width: min(640px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: clamp(24px, 5vw, 40px); border: 1px solid #cbd2d9; border-radius: 20px; background: #fff; color: #1f2933; font: 16px/1.65 Arial, sans-serif; box-shadow: 0 24px 80px #00215930; }
+/* Restore modal centering when a page reset removes the browser's auto margins. */
+#site-notice-dialog { position: fixed; inset: 0; margin: auto; box-sizing: border-box; width: min(640px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: clamp(24px, 5vw, 40px); border: 1px solid #cbd2d9; border-radius: 20px; background: #fff; color: #1f2933; font: 16px/1.65 Arial, sans-serif; box-shadow: 0 24px 80px #00215930; }
 #site-notice-dialog::backdrop { background: #152638dd; }
 #site-notice-dialog h1 { font-size: clamp(24px, 4vw, 32px); line-height: 1.2; margin: 8px 0 20px; letter-spacing: -.6px; }
 #site-notice-dialog h2 { font-size: 18px; margin: 24px 0 8px; }
